@@ -59,13 +59,16 @@ Each entry can be either:
 (defun uniformat-buffer ()
   "Format current buffer."
   (interactive)
-  (run-hook-with-args-until-success 'uniformat-format-buffer-functions))
+  (let ((formatted (run-hook-with-args-until-success 'uniformat-format-buffer-functions)))
+    (when (and (not formatted) (called-interactively-p))
+      (message "No formatter found."))))
 
 ;;;###autoload
 (defun uniformat-region (start end)
   "Format region between START and END."
   (interactive "r")
-  (run-hook-with-args-until-success 'uniformat-format-region-functions start end))
+  (unless (run-hook-with-args-until-success 'uniformat-format-region-functions start end)
+    (message "No formatter found.")))
 
 ;;;###autoload
 (defun uniformat ()
