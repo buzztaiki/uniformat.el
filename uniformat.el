@@ -80,6 +80,7 @@ Each entry can be either:
 (define-minor-mode uniformat-buffer-on-save-mode
   "A minor mode to format buffer on save."
   :global nil
+  :lighter " UniFmt"
   (if uniformat-buffer-on-save-mode
       (add-hook 'before-save-hook #'uniformat-buffer nil t)
     (remove-hook 'before-save-hook #'uniformat-buffer t)))
