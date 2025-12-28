@@ -11,6 +11,7 @@ Add your favorite formatter for each major mode to `uniformat-mode-formatters`:
 
 (reformatter-define my/ruff-format :program "ruff" :args '("format" "-"))
 (add-to-list 'uniformat-mode-formatters '(python-mode my/ruff-format-buffer my/ruff-format-region))
+(add-to-list 'uniformat-mode-formatters '(python-ts-mode my/ruff-format-buffer my/ruff-format-region))
 ```
 
 When you run `M-x uniformat-buffer` or `M-x uniformat-region` in a configured mode, the corresponding formatter will be called.
