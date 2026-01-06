@@ -1,4 +1,4 @@
-;;; uniformat.el --- Unified formatting interface. -*- lexical-binding: t; -*-
+;;; uniform.el --- Unified formatting interface. -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2025  Taiki Sugawara
 
@@ -22,26 +22,26 @@
 
 ;;; Code:
 
-(defgroup uniformat ()
+(defgroup uniform ()
   "Unified formatting interface."
   :group 'convenience
-  :prefix "uniformat-")
+  :prefix "uniform-")
 
-(defcustom uniformat-format-buffer-functions '(uniformat-eglot-format-buffer-maybe
-                                               uniformat-format-buffer-by-mode)
+(defcustom uniform-format-buffer-functions '(uniform-eglot-format-buffer-maybe
+                                             uniform-format-buffer-by-mode)
   "A list of formating buffer functions.
 Functions are called by no argument in the order given until one of them returns non-nil."
   :type '(list function))
 
-(defcustom uniformat-format-region-functions '(uniformat-eglot-format-region-maybe
-                                               uniformat-format-region-by-mode)
+(defcustom uniform-format-region-functions '(uniform-eglot-format-region-maybe
+                                             uniform-format-region-by-mode)
   "A list of formating region functions.
 Functions are called by two arguments (START END) in the order given until one of them returns non-nil."
   :type '(list function))
 
 
 ;;;###autoload
-(defcustom uniformat-mode-formatters nil
+(defcustom uniform-mode-formatters nil
   "An alist mapping major modes to their formatter functions.
 
 Each entry can be either:
@@ -56,55 +56,55 @@ Each entry can be either:
                                                     (choice :tag "Region" (const nil) function)))))
 
 ;;;###autoload
-(defun uniformat-buffer ()
+(defun uniform-format-buffer ()
   "Format current buffer."
   (interactive)
-  (let ((formatted (run-hook-with-args-until-success 'uniformat-format-buffer-functions)))
+  (let ((formatted (run-hook-with-args-until-success 'uniform-format-buffer-functions)))
     (when (and (not formatted) (called-interactively-p))
       (message "No formatter found."))))
 
 ;;;###autoload
-(defun uniformat-region (start end)
+(defun uniform-format-region (start end)
   "Format region between START and END."
   (interactive "r")
-  (unless (run-hook-with-args-until-success 'uniformat-format-region-functions start end)
+  (unless (run-hook-with-args-until-success 'uniform-format-region-functions start end)
     (message "No formatter found.")))
 
 ;;;###autoload
-(defun uniformat ()
+(defun uniform-format ()
   "Format current buffer or region DWIM."
   (interactive)
-  (call-interactively (if (use-region-p) #'uniformat-region #'uniformat-buffer)))
+  (call-interactively (if (use-region-p) #'uniform-format-region #'uniform-format-buffer)))
 
 ;;;###autoload
-(define-minor-mode uniformat-buffer-on-save-mode
+(define-minor-mode uniform-format-buffer-on-save-mode
   "A minor mode to format buffer on save."
   :global nil
   :lighter " UniFmt"
-  (if uniformat-buffer-on-save-mode
-      (add-hook 'before-save-hook #'uniformat-buffer nil t)
-    (remove-hook 'before-save-hook #'uniformat-buffer t)))
+  (if uniform-format-buffer-on-save-mode
+      (add-hook 'before-save-hook #'uniform-format-buffer nil t)
+    (remove-hook 'before-save-hook #'uniform-format-buffer t)))
 
-(defun uniformat-buffer-on-save-mode-turn-on ()
-  "Turn on `uniformat-buffer-on-save-mode'."
-  (uniformat-buffer-on-save-mode 1))
+(defun uniform-format-buffer-on-save-mode-turn-on ()
+  "Turn on `uniform-format-buffer-on-save-mode'."
+  (uniform-format-buffer-on-save-mode 1))
 
 ;;;###autoload
-(define-globalized-minor-mode global-uniformat-buffer-on-save-mode uniformat-buffer-on-save-mode uniformat-buffer-on-save-mode-turn-on)
+(define-globalized-minor-mode global-uniform-format-buffer-on-save-mode uniform-format-buffer-on-save-mode uniform-format-buffer-on-save-mode-turn-on)
 
 ;; mode based formatter
-(defun uniformat-format-buffer-by-mode ()
-  "Format current buffer by major mode according to `uniformat-mode-formatters'."
-  (let ((formatter (pcase (alist-get major-mode uniformat-mode-formatters)
+(defun uniform-format-buffer-by-mode ()
+  "Format current buffer by major mode according to `uniform-mode-formatters'."
+  (let ((formatter (pcase (alist-get major-mode uniform-mode-formatters)
                      (`(,fn . ,_) fn)
                      (fn fn))))
     (when formatter
       (funcall formatter)
       t)))
 
-(defun uniformat-format-region-by-mode (start end)
-  "Format current region between START and END by major mode according to `uniformat-mode-formatters'."
-  (let ((formatter (pcase (alist-get major-mode uniformat-mode-formatters)
+(defun uniform-format-region-by-mode (start end)
+  "Format current region between START and END by major mode according to `uniform-mode-formatters'."
+  (let ((formatter (pcase (alist-get major-mode uniform-mode-formatters)
                      (`(,_ ,fn . ,_) fn)
                      (_ nil))))
     (when formatter
@@ -115,7 +115,7 @@ Each entry can be either:
 ;; eglot support
 (require 'eglot)
 
-(defun uniformat-eglot-format-buffer-maybe ()
+(defun uniform-eglot-format-buffer-maybe ()
   "Format current buffer using eglot if the buffer is managed by eglot and a
 formatter is provided by language server.
 
@@ -126,7 +126,7 @@ Returns non-nil if formatter was called.  Otherwise, returns nil."
     (eglot-format-buffer)
     t))
 
-(defun uniformat-eglot-format-region-maybe (start end)
+(defun uniform-eglot-format-region-maybe (start end)
   "Format current region between START and END using eglot if the buffer is managed by eglot and a
 formatter is provided by language server.
 
@@ -139,5 +139,5 @@ Returns non-nil if formatter was called.  Otherwise, returns nil."
     t))
 
 
-(provide 'uniformat)
-;;; uniformat.el ends here
+(provide 'uniform)
+;;; uniform.el ends here
