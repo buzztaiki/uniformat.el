@@ -121,7 +121,7 @@ formatter is provided by language server.
 
 Returns non-nil if formatter was called.  Otherwise, returns nil."
   (when (and (eglot-managed-p)
-             (eglot-server-capable '(:textDocument/formatting :documentFormattingProvider nil)))
+             (eglot-server-capable :documentFormattingProvider))
     (ignore-errors (eglot-code-action-organize-imports (point-min) (point-max)))
     (eglot-format-buffer)
     t))
@@ -132,9 +132,7 @@ formatter is provided by language server.
 
 Returns non-nil if formatter was called.  Otherwise, returns nil."
   (when (and (eglot-managed-p)
-             (let ((range '(:start ,(eglot--pos-to-lsp-position start) :end ,(eglot--pos-to-lsp-position end))))
-               (eglot-server-capable `(:textDocument/rangeFormatting :documentRangeFormattingProvider (:range ,range)))))
-    (ignore-errors (eglot-code-action-organize-imports start end))
+             (eglot-server-capable :documentRangeFormattingProvider))
     (eglot-format start end)
     t))
 
